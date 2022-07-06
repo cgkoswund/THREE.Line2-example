@@ -8,57 +8,33 @@ const canvas = document.querySelector("canvas.webgl");
 // Scene
 const scene = new THREE.Scene();
 
+//Lights
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+const directionalLightKey = new THREE.DirectionalLight(0xffffff, 1.2);
+const directionalLightFill = new THREE.DirectionalLight(0xffffff, 0.8);
+directionalLightKey.position.set(1, 2, 5);
+directionalLightFill.position.set(-1, -2, -4);
+scene.add(ambientLight, directionalLightKey, directionalLightFill);
+
 /**
  * Objects
  */
 
-const textureLoader = new THREE.TextureLoader();
-const matcapTexture = textureLoader.load("./textures/matcaps/1.png");
+const cube = new THREE.Mesh(
+  new THREE.BoxGeometry(10, 10, 10),
+  new THREE.MeshStandardMaterial({ color: "rebeccapurple" })
+);
+scene.add(cube);
 
-const geometry = new THREE.SphereGeometry(0.5, 8, 8);
-console.log(geometry);
-const material = new THREE.MeshMatcapMaterial({ matcap: matcapTexture });
-let mesh, group;
+/*\/\/**THREE.Line2******************* */
 
-const noOfSquares = 60; //edit this to get longer spiral
-const yShear = 1.4;
-for (let k = 0; k < noOfSquares; k++) {
-  group = new THREE.Group();
-  const newMeshScale = 0.9 - (0.8 * k) / noOfSquares;
-  for (let i = 0, j = 5; i < 5; i++, j--) {
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(i, j * yShear, 0);
-    mesh.scale.setScalar(newMeshScale);
-    group.add(mesh);
-
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(j, -i * yShear, 0);
-    mesh.scale.setScalar(newMeshScale);
-    group.add(mesh);
-
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(-i, -j * yShear, 0);
-    mesh.scale.setScalar(newMeshScale);
-    group.add(mesh);
-
-    mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(-j, i * yShear, 0);
-    mesh.scale.setScalar(newMeshScale);
-    group.add(mesh);
-  }
-  group.position.set(0, 0, -k * 1.4);
-  group.rotation.set(0, 0, -(0.25 + k * 0.1));
-  const newSquareScale = 1 + (1.2 * k) / noOfSquares;
-  group.scale.setScalar(newSquareScale);
-  scene.add(group);
-}
-
+/*/\/\********************* */
 /**
  * Sizes
  */
 const sizes = {
-  width: 800,
-  height: 600,
+  width: window.innerWidth,
+  height: window.innerHeight,
 };
 
 window.addEventListener("resize", () => {
@@ -82,10 +58,7 @@ const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
 camera.position.z = 3;
 scene.add(camera);
 
-camera.position.set(-2, 3, 10);
-// camera.position.set(0, 0, 191.93);
-// camera.rotation.set(-0, -0., -0.9, "XYZ");
-camera.lookAt(-2, 0, 0);
+camera.position.set(0, 0, 20);
 
 /**
  * Renderer
@@ -94,16 +67,12 @@ const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
 });
 renderer.setSize(sizes.width, sizes.height);
-// const controls = new OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
 
 const tick = () => {
-  // controls.update();
-  // console.log(camera.position);
-  // console.log(camera.rotation);
+  controls.update();
 
   renderer.render(scene, camera);
-  // console.log(camera.position);
-  // camera.lookAt(0, 0, 0);
   window.requestAnimationFrame(tick);
 };
 
